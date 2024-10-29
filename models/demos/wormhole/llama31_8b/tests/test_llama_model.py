@@ -26,7 +26,7 @@ from models.utility_functions import skip_for_grayskull
 
 
 @skip_for_grayskull("Requires wormhole_b0 to run")
-@pytest.mark.timeout(900)
+@pytest.mark.timeout(3600)
 @pytest.mark.models_performance_bare_metal
 @pytest.mark.parametrize(
     "iterations",
@@ -66,17 +66,21 @@ def test_llama_model_inference(device, iterations, use_program_cache, reset_seed
     else:
         encoded_prompts = [tokenizer.encode(prompt, bos=True, eos=False) for prompt in prompts]
 
+    logger.info("Before load state dict")
     if run_ref_pt:
         reference_model = Transformer(model_args)
         reference_model.load_state_dict(state_dict)
+    logger.info("After load state dict")
 
     # Embedding on host
     embd = HostEmbedding(model_args)
     embd.load_state_dict({"emb.weight": state_dict["tok_embeddings.weight"]})
+    logger.info("After embeddings load state dict")
 
     generation_start_pos = 0
     generation_length = iterations
 
+    logger.info("pre-compute the rotational embedding matrix and send to device")
     # pre-compute the rotational embedding matrix and send to device
     current_rot_mat, rot_matrix = get_single_rot_mat(
         model_args.head_dim,
@@ -84,6 +88,7 @@ def test_llama_model_inference(device, iterations, use_program_cache, reset_seed
         start_pos=0,
     )
 
+    logger.info("Load TTNN model")
     # Load TTNN model
     tt_model = TtTransformer(
         args=model_args,

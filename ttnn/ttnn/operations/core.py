@@ -564,8 +564,10 @@ def as_tensor(
         return tensor
 
     if cache_file_name is None:
+        logger.info("cache file name is none")
         return torch_to_ttnn(tensor, dtype, layout, device, memory_config, mesh_mapper)
     else:
+        logger.info("cache file name is NOT none")
 
         def from_torch_and_dump(
             tensor: torch.Tensor,
@@ -591,8 +593,9 @@ def as_tensor(
             storage_type = ""
 
         cache_file_name = f"{cache_file_name}{storage_type}_dtype_{dtype_name}_layout_{layout_name}.bin"
-
+        logger.info(cache_file_name)
         try:
+            logger.info("Right before load tensor")
             tensor = ttnn.load_tensor(cache_file_name, device=device)
             if tuple(tensor.shape) != tuple(tensor.shape):
                 logger.warning(
@@ -600,7 +603,9 @@ def as_tensor(
                 )
                 tensor = from_torch_and_dump(tensor, dtype, layout, cache_file_name, mesh_mapper)
             logger.debug(f"Loaded cache for {cache_file_name} of shape {tensor.shape}")
-        except (FileNotFoundError, RuntimeError):
+        except (FileNotFoundError, RuntimeError) as e:
+            logger.info("We're in some exception case")
+            logger.info(e)
             tensor = from_torch_and_dump(tensor, dtype, layout, cache_file_name, mesh_mapper)
         return tensor
 

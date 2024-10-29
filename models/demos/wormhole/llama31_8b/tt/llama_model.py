@@ -33,6 +33,7 @@ class TtTransformer(nn.Module):
         self.model_config = args.get_model_config()
         assert self.vocab_size > 0
 
+        print("Doing self.layers")
         self.layers = torch.nn.ModuleList(
             [
                 TtTransformerBlock(
@@ -48,6 +49,7 @@ class TtTransformer(nn.Module):
                 for i in layers
             ]
         )
+        print("doing norm")
         self.norm = RMSNorm(
             device=device,
             dim=args.dim,
@@ -58,14 +60,30 @@ class TtTransformer(nn.Module):
             weight_key="norm",
         )
 
+        print("doing output weight")
+        print(type(weight_cache_path))
+        x = weight_cache_path / "output.weight"
+        print("printing x")
+        print(type(x))
+        print(x)
+        print("printing stuff about the output_weight in state_dict")
+        print("output.weight" in state_dict)
+        print(type(state_dict))
+        print(type(state_dict["output.weight"]))
+        print("trying to assign and print sizes")
+        output_layer = state_dict["output.weight"]
+        print(output_layer.size())  # Outputs the dimensions of the tensor
+        print(output_layer.numel())  # Outputs the total number of elements in the tensor
+        print("made it passed the printing")
         self.output_weight = ttnn.as_tensor(
-            state_dict["output.weight"].permute(1, 0),
+            output_layer.permute(1, 0),
             device=device,
             layout=ttnn.TILE_LAYOUT,
             dtype=dtype,
             memory_config=ttnn.DRAM_MEMORY_CONFIG,
             cache_file_name=weight_cache_path / "output.weight",
         )
+        print("We made it!!")
 
     def forward(
         self,
