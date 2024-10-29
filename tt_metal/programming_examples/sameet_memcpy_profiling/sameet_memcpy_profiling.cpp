@@ -33,27 +33,27 @@ int main(int argc, char **argv) {
     CommandQueue& cq = device->command_queue();
     Program program = CreateProgram();
 
-    /* 
+    /*
     Make Buffers
     */
     const int num_pages = 16;
     int N = 1024*num_pages;
     const int size_dram = 4*N;
     const int page_size_dram_src = 4*32*32; // reducing page size so there is some interleaving
-    const int page_size_dram_dest = 4*N; 
+    const int page_size_dram_dest = 4*N;
     const int size_l1 = 8*N;
     const int page_size_l1 = 8*N;
 
     tt::tt_metal::InterleavedBufferConfig dram_config{
                 .device= device,
                 .size = size_dram,
-                .page_size = page_size_dram_src, 
+                .page_size = page_size_dram_src,
                 .buffer_type = tt::tt_metal::BufferType::DRAM
     };
     tt::tt_metal::InterleavedBufferConfig dram_dest_config{
                 .device= device,
                 .size = size_dram,
-                .page_size = page_size_dram_dest, 
+                .page_size = page_size_dram_dest,
                 .buffer_type = tt::tt_metal::BufferType::DRAM
     };
 

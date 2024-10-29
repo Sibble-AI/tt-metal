@@ -28,7 +28,7 @@ void kernel_main() {
     std::uint64_t src1_dram_noc_addr = get_noc_addr(src1_dram_noc_x, src1_dram_noc_y, src1_dram_buffer_addr);
     std::uint64_t dst_dram_noc_addr = get_noc_addr(dst_dram_noc_x, dst_dram_noc_y, dst_dram_buffer_addr);
 
-    int buffer_elems = buffer_size >> 2; //4 bytes per word 
+    int buffer_elems = buffer_size >> 2; //4 bytes per word
     int num_iters = 1024*64;
 
     for (int iter = 0; iter < num_iters; iter++){
@@ -80,7 +80,7 @@ void kernel_main() {
 
     noc_async_write(l1_buffer_addr, dst_dram_noc_addr, buffer_size);
     noc_async_write_barrier();
-    
+
     #if DEBUG_PRINT
         DPRINT << "Done writing out" << ENDL();
     #endif

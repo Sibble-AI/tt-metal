@@ -28,15 +28,15 @@ void kernel_main() {
     std::uint64_t src1_dram_noc_addr = get_noc_addr(src1_dram_noc_x, src1_dram_noc_y, src1_dram_buffer_addr);
     std::uint64_t dst_dram_noc_addr = get_noc_addr(dst_dram_noc_x, dst_dram_noc_y, dst_dram_buffer_addr);
 
-    int buffer_elems = buffer_size >> 2; //4 bytes per word 
-    const int page_size = 4*32*32; 
+    int buffer_elems = buffer_size >> 2; //4 bytes per word
+    const int page_size = 4*32*32;
 
     #if DEBUG_PRINT
         DPRINT << "Buffer size: " << buffer_size << ENDL();
         DPRINT << "Buffer elems: " << buffer_elems << ENDL();
         DPRINT << "Reading src0" << ENDL();
     #endif
-    
+
     const InterleavedAddrGenFast<true> s0 = {
         .bank_base_address = src0_dram_buffer_addr,
         .page_size = page_size,
@@ -92,7 +92,7 @@ void kernel_main() {
 
     noc_async_write(l1_buffer_addr, dst_dram_noc_addr, buffer_size);
     noc_async_write_barrier();
-    
+
     #if DEBUG_PRINT
         DPRINT << "Done writing out" << ENDL();
     #endif
